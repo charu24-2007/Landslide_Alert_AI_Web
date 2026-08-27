@@ -447,5 +447,14 @@
   "slopeBridgeVuln": "Slope & Bridge Vulnerability",
   "isolatedHabitations": "Isolated Habitations",
   "liveStatusBlockages": "Live status of road blockages, landslide debris volume, clearing machinery, and detour routes.",
-  "fullInfraPage": "Full Infrastructure Page →"
+  "fullInfraPage": "Full Infrastructure Page →",
+  "weatherSatellite": "Weather & Satellite",
+  "historicalAnalysis": "Historical Analysis",
+  "analysisDashboard": "Analysis Dashboard",
+  "dataSources": "Data Source Status",
+  "modelConfidence": "Model Confidence",
+  "sensorCoverage": "Active Sensor Coverage",
+  "fieldDashboard": "Field Officer View",
+  "assignedLocations": "Assigned Locations",
+  "myReports": "My Reports"
 }

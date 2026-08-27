@@ -103,7 +103,6 @@ function AppShell() {
           <Route path="/roads-villages" element={<ProtectedRoute permission="roads_villages"><RoadsVillages district={district} /></ProtectedRoute>} />
           <Route path="/emergency-response" element={<ProtectedRoute permission="emergency_response"><EmergencyResponse /></ProtectedRoute>} />
           <Route path="/reports-history" element={<ProtectedRoute permission="reports_history"><ReportsHistory /></ProtectedRoute>} />
-          <Route path="/admin" element={<ProtectedRoute permission="admin"><Administration /></ProtectedRoute>} />
           <Route path="/infrastructure-impact" element={<ProtectedRoute permission="roads_villages"><InfrastructureImpact /></ProtectedRoute>} />
           <Route path="/access-denied" element={<AccessDenied />} />
 
@@ -111,12 +110,15 @@ function AppShell() {
           <Route path="/weather-sensors" element={<Navigate to="/iot-sensors" replace />} />
           <Route path="/weather" element={<Navigate to="/iot-sensors" replace />} />
           <Route path="/sensors" element={<Navigate to="/iot-sensors" replace />} />
-          <Route path="/infrastructure" element={<Navigate to="/infrastructure-impact" replace />} />
+          <Route path="/infrastructure" element={<Navigate to="/roads-villages" replace />} />
           <Route path="/villages" element={<Navigate to="/roads-villages" replace />} />
           <Route path="/field" element={<Navigate to="/field-reports" replace />} />
           <Route path="/response" element={<Navigate to="/emergency-response" replace />} />
           <Route path="/historical" element={<Navigate to="/reports-history" replace />} />
+          <Route path="/historical-analysis" element={<Navigate to="/reports-history" replace />} />
           <Route path="/reports" element={<Navigate to="/reports-history" replace />} />
+          {/* Admin kept as hidden route but not in sidebar nav */}
+          <Route path="/admin" element={<ProtectedRoute permission="admin"><Administration /></ProtectedRoute>} />
 
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

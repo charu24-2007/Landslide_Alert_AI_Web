@@ -1,129 +1,161 @@
-// Sidebar.jsx — AquaGuard-Exact Sidebar for LandSlideAlert AI
-import React from 'react';
+// Sidebar.jsx — Role-Based Navigation: Authority (7 items) vs Analyst (6 items)
+import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, Map, Brain, CloudRain, Bell,
-  Clipboard, Construction, Zap, FileText, Settings,
-  LogOut, Globe, Radio, Building2
+  Clipboard, Construction, Zap, FileText, Radio,
+  LogOut, Globe, ChevronDown, Cloud, Shield, History
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 
+// Role-specific navigation configs
+const NAV_CONFIG = {
+  authority: [
+    { path: '/',                   label: 'dashboard',         icon: LayoutDashboard },
+    { path: '/map',                label: 'riskMap',           icon: Map },
+    { path: '/ai',                 label: 'aiRiskAnalysis',    icon: Brain },
+    { path: '/alerts',             label: 'alertsWarnings',    icon: Bell,         badge: true },
+    { path: '/roads-villages',     label: 'roadsVillages',     icon: Construction },
+    { path: '/field-reports',      label: 'fieldReports',      icon: Clipboard },
+    { path: '/emergency-response', label: 'emergencyResponse', icon: Zap },
+  ],
+  analyst: [
+    { path: '/',                   label: 'dashboard',         icon: LayoutDashboard },
+    { path: '/map',                label: 'riskMap',           icon: Map },
+    { path: '/iot-sensors',        label: 'weatherSatellite',  icon: CloudRain },
+    { path: '/iot-sensors',        label: 'iotSensorsNav',     icon: Radio },
+    { path: '/ai',                 label: 'aiRiskAnalysis',    icon: Brain },
+    { path: '/reports-history',    label: 'historicalAnalysis', icon: History },
+  ],
+  field: [
+    { path: '/',                   label: 'dashboard',         icon: LayoutDashboard },
+    { path: '/field-reports',      label: 'fieldReports',      icon: Clipboard },
+  ],
+  citizen: [
+    { path: '/',                   label: 'dashboard',         icon: LayoutDashboard },
+  ],
+};
+
 export default function Sidebar({ alertCount = 5 }) {
   const { user, roleInfo, logout, hasPermission } = useAuth();
-  const { lang, changeLanguage, t, LANGUAGES } = useLanguage();
+  const { lang, changeLanguage, t, LANGUAGES, currentLangObj } = useLanguage();
   const navigate = useNavigate();
+  const [langOpen, setLangOpen] = useState(false);
 
   const handleLogout = () => { logout(); navigate('/login'); };
 
-  const navSections = [
-    {
-      items: [
-        { path: '/', label: t('dashboard'), icon: LayoutDashboard, perm: 'dashboard' },
-      ]
-    },
-    {
-      items: [
-        { path: '/map', label: t('riskMap'), icon: Map, perm: 'map' },
-        { path: '/ai', label: t('aiRiskAnalysis'), icon: Brain, perm: 'ai' },
-        { path: '/iot-sensors', label: t('iotSensorsNav'), icon: Radio, perm: 'iot_sensors' },
-        { path: '/alerts', label: t('alertsWarnings'), icon: Bell, perm: 'alerts', badge: alertCount },
-        { path: '/field-reports', label: t('fieldReports'), icon: Clipboard, perm: 'field_reports' },
-        { path: '/roads-villages', label: t('roadsVillages'), icon: Construction, perm: 'roads_villages' },
-        { path: '/infrastructure-impact', label: t('infrastructureImpact'), icon: Building2, perm: 'roads_villages' },
-        { path: '/emergency-response', label: t('emergencyResponse'), icon: Zap, perm: 'emergency_response' },
-        { path: '/reports-history', label: t('reportsHistory'), icon: FileText, perm: 'reports_history' },
-        { path: '/admin', label: t('administration'), icon: Settings, perm: 'admin' },
-      ]
-    },
-  ];
+  const role = user?.role || 'authority';
+  const navItems = NAV_CONFIG[role] || NAV_CONFIG.authority;
+
+  // For analyst, the two IoT items both go to same path — deduplicate by path for rendering (keep both as separate items)
+  // but mark the second one as "sensors" sub-page for clarity via unique key
+  const uniqueKeyedItems = navItems.map((item, i) => ({ ...item, _key: `${item.path}-${i}` }));
+
+  const avatarInitial = user?.name ? user.name.charAt(0).toUpperCase() : 'U';
+  const roleColor = roleInfo?.color || '#1199D4';
 
   return (
-    <aside style={sidebarStyles.sidebar}>
-      {/* App Brand */}
-      <div style={sidebarStyles.brand}>
-        <div style={sidebarStyles.brandName}>LANDSLIDE ALERT AI</div>
-        <div style={sidebarStyles.brandSub}>
-          AI-Based Early Warning &amp; Landslide Risk Monitoring for NER
+    <aside style={sb.sidebar}>
+      {/* ── Brand ── */}
+      <div style={sb.brand}>
+        <div style={sb.brandName}>Landslide Alert AI</div>
+        <div style={sb.brandSub}>AI-Based Early Warning &amp; Landslide Risk Monitoring for NER</div>
+      </div>
+
+      {/* ── Language Selector ── */}
+      <div style={sb.langWrap} onClick={() => setLangOpen(o => !o)}>
+        <Globe size={13} color="#536273" />
+        <span style={sb.langLabel}>{currentLangObj?.native || 'English'}</span>
+        <ChevronDown size={12} color="#8292A2" style={{ marginLeft: 'auto', transition: 'transform 0.2s', transform: langOpen ? 'rotate(180deg)' : 'none' }} />
+      </div>
+      {langOpen && (
+        <div style={sb.langDropdown}>
+          {LANGUAGES.map(l => (
+            <div
+              key={l.code}
+              onClick={() => { changeLanguage(l.code); setLangOpen(false); }}
+              style={{
+                ...sb.langOption,
+                background: lang === l.code ? '#EAF5FB' : 'transparent',
+                color: lang === l.code ? '#1199D4' : '#374151',
+                fontWeight: lang === l.code ? 700 : 400,
+              }}
+            >
+              <span>{l.native}</span>
+              <span style={{ fontSize: 11, color: '#8292A2' }}>{l.label}</span>
+            </div>
+          ))}
         </div>
+      )}
+
+      {/* ── Online Status ── */}
+      <div style={sb.onlinePill}>
+        <Cloud size={12} color="#FFFFFF" />
+        <span style={{ fontSize: 12, fontWeight: 700, color: '#FFFFFF' }}>Online</span>
+        <span style={sb.liveDot} />
       </div>
 
-      {/* Language Selector */}
-      <div style={sidebarStyles.langWrap}>
-        <Globe size={14} color="#536273" />
-        <select
-          value={lang}
-          onChange={e => changeLanguage(e.target.value)}
-          style={sidebarStyles.langSelect}
-        >
-          {LANGUAGES.map(l => <option key={l.code} value={l.code}>{l.native}</option>)}
-        </select>
-      </div>
-
-      {/* Online status badge */}
-      <div style={sidebarStyles.onlineBadge}>
-        <span style={sidebarStyles.onlineDot} />
-        <span style={{ fontSize: 12, fontWeight: 700, color: '#0891B2' }}>Online</span>
-      </div>
-
-      {/* Navigation */}
-      <nav style={sidebarStyles.nav}>
-        {navSections.map((section, si) => (
-          <ul key={si} style={sidebarStyles.navList}>
-            {section.items.filter(it => hasPermission(it.perm)).map(item => {
-              const Icon = item.icon;
-              return (
-                <li key={item.path}>
-                  <NavLink
-                    to={item.path}
-                    end={item.path === '/'}
-                    style={({ isActive }) => ({
-                      ...sidebarStyles.navLink,
-                      background: isActive ? '#1199D4' : 'transparent',
-                      color: isActive ? '#FFFFFF' : '#374151',
-                    })}
-                  >
-                    {({ isActive }) => (
-                      <>
-                        <Icon size={16} color={isActive ? '#FFFFFF' : '#536273'} style={{ flexShrink: 0 }} />
-                        <span>{item.label}</span>
-                        {item.badge && item.badge > 0 && (
-                          <span style={{
-                            ...sidebarStyles.badge,
-                            background: isActive ? 'rgba(255,255,255,0.25)' : '#FEF2F2',
-                            color: isActive ? '#FFF' : '#E52B2B',
-                          }}>
-                            {String(item.badge).padStart(2, '0')}
-                          </span>
-                        )}
-                      </>
-                    )}
-                  </NavLink>
-                </li>
-              );
-            })}
-          </ul>
-        ))}
+      {/* ── Navigation ── */}
+      <nav style={sb.nav}>
+        <ul style={sb.navList}>
+          {uniqueKeyedItems.map(item => {
+            const Icon = item.icon;
+            const showBadge = item.badge && alertCount > 0;
+            return (
+              <li key={item._key}>
+                <NavLink
+                  to={item.path}
+                  end={item.path === '/'}
+                  style={({ isActive }) => ({
+                    ...sb.navLink,
+                    background: isActive ? '#1199D4' : 'transparent',
+                    color: isActive ? '#FFFFFF' : '#374151',
+                  })}
+                >
+                  {({ isActive }) => (
+                    <>
+                      <Icon size={16} color={isActive ? '#FFFFFF' : '#536273'} style={{ flexShrink: 0 }} />
+                      <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {t(item.label)}
+                      </span>
+                      {showBadge && (
+                        <span style={{
+                          ...sb.badge,
+                          background: isActive ? 'rgba(255,255,255,0.25)' : '#FEF2F2',
+                          color: isActive ? '#FFF' : '#E52B2B',
+                        }}>
+                          {String(alertCount).padStart(2, '0')}
+                        </span>
+                      )}
+                    </>
+                  )}
+                </NavLink>
+              </li>
+            );
+          })}
+        </ul>
       </nav>
 
-      {/* User Footer */}
-      <div style={sidebarStyles.userFooter}>
-        <div style={sidebarStyles.avatar}>
-          {user?.name ? user.name.charAt(0).toUpperCase() : 'C'}
+      {/* ── User Block (pinned bottom) ── */}
+      <div style={sb.userFooter}>
+        <div style={{ ...sb.avatar, background: roleColor }}>
+          {avatarInitial}
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontSize: 13, fontWeight: 700, color: '#1F2933', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-            {user?.name || 'Charumithra C.'}
+            {user?.name || 'User'}
           </div>
-          <div style={{ fontSize: 11, color: '#536273', marginTop: 1 }}>
-            {roleInfo?.name || 'District Authority'}
+          <div style={{ fontSize: 11, color: '#536273', marginTop: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            {user?.email || ''}
+          </div>
+          {/* Role badge pill */}
+          <div style={{ ...sb.roleBadge, borderColor: roleColor, color: roleColor }}>
+            <Shield size={9} color={roleColor} />
+            <span>{roleInfo?.name || 'Authority'}</span>
           </div>
         </div>
-        <button
-          onClick={handleLogout}
-          title={t('logout')}
-          style={sidebarStyles.logoutBtn}
-        >
+        <button onClick={handleLogout} title={t('logout')} style={sb.logoutBtn}>
           <LogOut size={14} color="#8292A2" />
         </button>
       </div>
@@ -131,10 +163,10 @@ export default function Sidebar({ alertCount = 5 }) {
   );
 }
 
-const sidebarStyles = {
+const sb = {
   sidebar: {
-    width: 210,
-    minWidth: 210,
+    width: 240,
+    minWidth: 240,
     background: '#FFFFFF',
     borderRight: '1px solid #E5E7EB',
     display: 'flex',
@@ -144,13 +176,14 @@ const sidebarStyles = {
     top: 0,
     zIndex: 40,
     fontFamily: "'Inter', system-ui, sans-serif",
+    overflowY: 'auto',
   },
   brand: {
-    padding: '20px 16px 14px',
+    padding: '22px 18px 14px',
     borderBottom: '1px solid #F3F4F6',
   },
   brandName: {
-    fontSize: 15,
+    fontSize: 17,
     fontWeight: 800,
     color: '#1199D4',
     lineHeight: 1.2,
@@ -172,41 +205,57 @@ const sidebarStyles = {
     borderRadius: 8,
     cursor: 'pointer',
     background: '#FAFAFA',
+    userSelect: 'none',
+    position: 'relative',
   },
-  langSelect: {
-    flex: 1,
-    background: 'transparent',
-    border: 'none',
+  langLabel: {
     fontSize: 12,
     fontWeight: 600,
     color: '#374151',
-    cursor: 'pointer',
-    outline: 'none',
   },
-  onlineBadge: {
+  langDropdown: {
+    margin: '4px 12px 0',
+    border: '1px solid #E5E7EB',
+    borderRadius: 10,
+    background: '#FFFFFF',
+    boxShadow: '0 8px 24px rgba(0,0,0,0.1)',
+    overflow: 'hidden',
+    zIndex: 100,
+    maxHeight: 220,
+    overflowY: 'auto',
+  },
+  langOption: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '8px 12px',
+    cursor: 'pointer',
+    fontSize: 12.5,
+    borderBottom: '1px solid #F3F4F6',
+    transition: 'background 0.1s',
+  },
+  onlinePill: {
     display: 'inline-flex',
     alignItems: 'center',
     gap: 5,
     margin: '10px 12px 0',
-    padding: '4px 10px',
-    background: '#ECFEFF',
-    border: '1px solid #A5F3FC',
+    padding: '5px 10px',
+    background: '#1199D4',
     borderRadius: 20,
     width: 'fit-content',
   },
-  onlineDot: {
-    width: 7,
-    height: 7,
+  liveDot: {
+    width: 6,
+    height: 6,
     borderRadius: '50%',
-    background: '#06B6D4',
+    background: '#86EFAC',
     display: 'inline-block',
-    boxShadow: '0 0 0 2px rgba(6,182,212,0.2)',
     animation: 'pulse-ring 2s infinite',
   },
   nav: {
     flex: 1,
     overflowY: 'auto',
-    padding: '12px 10px',
+    padding: '14px 10px',
   },
   navList: {
     listStyle: 'none',
@@ -218,7 +267,7 @@ const sidebarStyles = {
     display: 'flex',
     alignItems: 'center',
     gap: 9,
-    height: 38,
+    minHeight: 40,
     padding: '0 10px',
     borderRadius: 8,
     textDecoration: 'none',
@@ -232,26 +281,40 @@ const sidebarStyles = {
     fontWeight: 700,
     padding: '2px 6px',
     borderRadius: 10,
+    flexShrink: 0,
   },
   userFooter: {
     padding: '12px 14px',
     borderTop: '1px solid #F3F4F6',
     display: 'flex',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     gap: 10,
+    flexShrink: 0,
   },
   avatar: {
-    width: 32,
-    height: 32,
+    width: 34,
+    height: 34,
     borderRadius: '50%',
-    background: '#1199D4',
     color: '#FFFFFF',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: 700,
     flexShrink: 0,
+    marginTop: 2,
+  },
+  roleBadge: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: 4,
+    marginTop: 5,
+    padding: '2px 7px',
+    border: '1px solid',
+    borderRadius: 20,
+    fontSize: 10,
+    fontWeight: 700,
+    background: '#FFFFFF',
   },
   logoutBtn: {
     background: 'none',
@@ -262,5 +325,6 @@ const sidebarStyles = {
     display: 'flex',
     alignItems: 'center',
     flexShrink: 0,
+    marginTop: 2,
   },
 };

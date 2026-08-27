@@ -1,20 +1,24 @@
-// KPIRow.jsx — AquaGuard-Exact Pastel KPI Cards for LandSlideAlert AI with Full Multilingual Support
+// KPIRow.jsx — Role-specific pastel KPI cards (AquaGuard design system)
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { TrendingUp, AlertTriangle, Layers, Radio, Construction } from 'lucide-react';
+import { TrendingUp, AlertTriangle, Layers, Radio, Construction, Database, Cpu, Activity, CheckCircle } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
+import { useAuth } from '../../context/AuthContext';
 
 export default function KPIRow({ alertCount = 4 }) {
   const navigate = useNavigate();
   const { t } = useLanguage();
+  const { user } = useAuth();
+  const role = user?.role || 'authority';
 
-  const kpiData = [
+  // Authority KPI cards — Risk/Impact/Action focus
+  const authorityKPIs = [
     {
       id: 'risk',
       label: t('overallRiskLevel'),
       value: t('high').toUpperCase(),
       sub: `${t('riskScore')}: 78 / 100 • ${t('increasing')}`,
-      color: '#F97316',       // orange
+      color: '#F97316',
       bg: '#FFF7ED',
       border: '#FED7AA',
       icon: TrendingUp,
@@ -71,6 +75,72 @@ export default function KPIRow({ alertCount = 4 }) {
     }
   ];
 
+  // Analyst KPI cards — Data/Model focus
+  const analystKPIs = [
+    {
+      id: 'model',
+      label: t('modelConfidence'),
+      value: '94.8%',
+      sub: 'Random Forest + LSTM • GSI 78K records',
+      color: '#1199D4',
+      bg: '#EAF5FB',
+      border: '#BDE5F7',
+      icon: Cpu,
+      iconColor: '#0EA5E9',
+      path: '/ai'
+    },
+    {
+      id: 'datasources',
+      label: t('dataSources'),
+      value: '3 / 3',
+      sub: 'IMD AWS: Active • GSI: Active • DEM: Active',
+      color: '#16A34A',
+      bg: '#F0FDF4',
+      border: '#BBF7D0',
+      icon: Database,
+      iconColor: '#22C55E',
+      path: '/iot-sensors'
+    },
+    {
+      id: 'sensors',
+      label: t('sensorCoverage'),
+      value: '39 / 42',
+      sub: `${t('online')}: 39 • ${t('offline')}: 3 • LoRa: 92%`,
+      color: '#F97316',
+      bg: '#FFF7ED',
+      border: '#FED7AA',
+      icon: Radio,
+      iconColor: '#F97316',
+      path: '/iot-sensors'
+    },
+    {
+      id: 'zones',
+      label: t('highRiskZones'),
+      value: '12',
+      sub: `${t('critical')}: 3 • ${t('high')}: 9 • Total: 30`,
+      color: '#E52B2B',
+      bg: '#FEF2F2',
+      border: '#FECACA',
+      icon: AlertTriangle,
+      iconColor: '#EF4444',
+      path: '/map'
+    },
+    {
+      id: 'reports',
+      label: 'Model Validations',
+      value: '18',
+      sub: 'Field-verified this week • Accuracy ↑2.3%',
+      color: '#7C3AED',
+      bg: '#F5F3FF',
+      border: '#DDD6FE',
+      icon: CheckCircle,
+      iconColor: '#8B5CF6',
+      path: '/reports-history'
+    }
+  ];
+
+  const kpiData = role === 'analyst' ? analystKPIs : authorityKPIs;
+
   return (
     <div style={{
       display: 'grid',
@@ -109,7 +179,9 @@ export default function KPIRow({ alertCount = 4 }) {
               <span style={{ fontSize: 11, fontWeight: 700, color: '#536273', textTransform: 'uppercase', letterSpacing: '0.04em', lineHeight: 1.3 }}>
                 {kpi.label}
               </span>
-              <Icon size={20} color={kpi.iconColor} style={{ flexShrink: 0, opacity: 0.7 }} />
+              <div style={{ width: 28, height: 28, borderRadius: 8, background: kpi.border, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <Icon size={16} color={kpi.iconColor} />
+              </div>
             </div>
             {/* Big metric */}
             <div style={{ fontSize: 28, fontWeight: 800, color: kpi.color, lineHeight: 1, letterSpacing: '-0.02em' }}>

@@ -67,8 +67,20 @@ export default function Dashboard({ district = 'all' }) {
       {/* Page Title & Common Controls */}
       <div className="page-heading-box">
         <div className="page-title-group">
-          <h1>{t('districtRiskOverview')}</h1>
-          <p>{t('realTimeMonitoring')}</p>
+          <h1>
+            {role === 'analyst'
+              ? t('analysisDashboard')
+              : role === 'field'
+              ? t('fieldDashboard')
+              : t('districtRiskOverview')}
+          </h1>
+          <p>
+            {role === 'analyst'
+              ? 'Data source status, model confidence overview & active sensor coverage'
+              : role === 'field'
+              ? 'Your assigned high-risk locations and field report submission history'
+              : t('realTimeMonitoring')}
+          </p>
         </div>
 
         <div className="page-actions-group">
