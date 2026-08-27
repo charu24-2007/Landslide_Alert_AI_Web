@@ -25,6 +25,7 @@ export default function Dashboard({ district = 'all' }) {
   const [selectedZone, setSelectedZone] = useState(null);
   const [timeWindow, setTimeWindow] = useState('24h');
   const [refreshing, setRefreshing] = useState(false);
+  const [activeTab, setActiveTab] = useState('overview');
 
   // Field Officer Report Form State
   const [reportType, setReportType] = useState('landslide');
@@ -161,126 +162,283 @@ export default function Dashboard({ district = 'all' }) {
         </div>
       )}
 
-      {/* ── DISTRICT AUTHORITY DASHBOARD (RISK → IMPACT → RESPONSE) ── */}
+      {/* ── DISTRICT AUTHORITY DASHBOARD TABS ── */}
       {role === 'authority' && (
         <>
-          <div style={{ display: 'grid', gridTemplateColumns: '1.65fr 1fr', gap: 20 }}>
-            {/* GIS Map */}
-            <div className="clean-card" style={{ padding: 20 }}>
-              <div className="card-header-row" style={{ marginBottom: 12 }}>
-                <div className="card-title-group">
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <Map size={16} color="var(--primary)" />
-                    <h3>{t('realtimeGISMap')}</h3>
-                  </div>
-                  <p>{t('geoSpatialDesc')}</p>
-                </div>
-                <button className="btn-secondary btn-sm" onClick={() => navigate('/map')}>
-                  {t('fullMap')} <ArrowRight size={12} />
-                </button>
-              </div>
+          <div style={{ display: 'flex', gap: 12, marginBottom: 20, borderBottom: '2px solid var(--border)', paddingBottom: 10 }}>
+            <button
+              onClick={() => setActiveTab('overview')}
+              style={{
+                padding: '10px 22px',
+                borderRadius: 8,
+                border: 'none',
+                fontWeight: 700,
+                fontSize: 14,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                background: activeTab === 'overview' ? 'var(--primary)' : 'var(--surface)',
+                color: activeTab === 'overview' ? '#FFFFFF' : 'var(--text-secondary)',
+                boxShadow: activeTab === 'overview' ? '0 4px 14px rgba(37,99,235,0.3)' : 'none',
+                transition: 'all 0.2s ease',
+              }}
+            >
+              <Map size={16} />
+              <span>District Risk Overview</span>
+            </button>
 
-              <GISMap
-                district={district}
-                selectedZone={selectedZone}
-                onZoneSelect={(zone) => setSelectedZone(zone)}
-                height={400}
-              />
-            </div>
-
-            {/* Active Alerts */}
-            <ActiveAlertsPanel limit={4} onRefresh={handleRefresh} />
+            <button
+              onClick={() => setActiveTab('infrastructure')}
+              style={{
+                padding: '10px 22px',
+                borderRadius: 8,
+                border: 'none',
+                fontWeight: 700,
+                fontSize: 14,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                background: activeTab === 'infrastructure' ? 'var(--primary)' : 'var(--surface)',
+                color: activeTab === 'infrastructure' ? '#FFFFFF' : 'var(--text-secondary)',
+                boxShadow: activeTab === 'infrastructure' ? '0 4px 14px rgba(37,99,235,0.3)' : 'none',
+                transition: 'all 0.2s ease',
+              }}
+            >
+              <Construction size={16} />
+              <span>Infrastructure Impact</span>
+              <span
+                style={{
+                  fontSize: 11,
+                  padding: '2px 8px',
+                  borderRadius: 10,
+                  background: activeTab === 'infrastructure' ? 'rgba(255,255,255,0.25)' : 'var(--risk-critical)',
+                  color: '#FFFFFF',
+                  fontWeight: 800,
+                }}
+              >
+                {roads.filter(r => r.blocked).length} Blocked
+              </span>
+            </button>
           </div>
 
-          {/* Priority Risk Situation (RISK → IMPACT → ACTION) */}
-          <PriorityRiskSituation
-            zone={selectedZone}
-            onSelectZone={(z) => setSelectedZone(z)}
-          />
-
-          {/* Supporting Info Section */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 20 }}>
-            {/* IoT Real-time Telemetry Station card */}
-            <div className="clean-card" style={{ cursor: 'pointer' }} onClick={() => navigate('/iot-sensors')}>
-              <div className="card-header-row">
-                <div className="card-title-group">
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <Radio size={16} color="var(--primary)" />
-                    <h3>{t('iotSensorsPage')}</h3>
-                  </div>
-                  <p>19 Deployed Sensor Components</p>
-                </div>
-                <span className="status-badge badge-critical" style={{ fontSize: 11 }}>{t('critical')}</span>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 12 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                  <span style={{ fontSize: 14, color: 'var(--text-secondary)' }}>Soil Moisture Sensor V2.0:</span>
-                  <b style={{ fontSize: 22, color: 'var(--risk-critical)' }}>87% Saturation</b>
-                </div>
-                <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>
-                  MPU6050 Tilt: 3.8° • Rain FC-37: 187 mm/24h • LoRa-02: -58 dBm
-                </div>
-                <div style={{ background: 'var(--bg)', padding: '10px 12px', borderRadius: 6, fontSize: 13, color: 'var(--primary)', fontWeight: 600 }}>
-                  ➔ {t('viewDetails')} in {t('iotSensorsNav')}
-                </div>
-              </div>
-            </div>
-
-            {/* Infrastructure connectivity card */}
-            <div className="clean-card" style={{ cursor: 'pointer' }} onClick={() => navigate('/roads-villages')}>
-              <div className="card-header-row">
-                <div className="card-title-group">
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <Construction size={16} color="var(--risk-critical)" />
-                    <h3>{t('roadsVillagesTitle')}</h3>
-                  </div>
-                  <p>{criticalRoads.length} {t('criticalRoads')}</p>
-                </div>
-                <ArrowRight size={14} color="var(--text-muted)" />
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 12, fontSize: 13.5 }}>
-                {criticalRoads.slice(0, 2).map((r) => (
-                  <div key={r.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid var(--border-subtle)' }}>
-                    <div>
-                      <b>{r.name}</b>
-                      <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{r.agency} • {r.corridor}</div>
+          {/* TAB 1: OVERVIEW */}
+          {activeTab === 'overview' && (
+            <>
+              <div style={{ display: 'grid', gridTemplateColumns: '1.65fr 1fr', gap: 20 }}>
+                {/* GIS Map */}
+                <div className="clean-card" style={{ padding: 20 }}>
+                  <div className="card-header-row" style={{ marginBottom: 12 }}>
+                    <div className="card-title-group">
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <Map size={16} color="var(--primary)" />
+                        <h3>{t('realtimeGISMap')}</h3>
+                      </div>
+                      <p>{t('geoSpatialDesc')}</p>
                     </div>
-                    <span className={`status-badge ${r.blocked ? 'badge-critical' : 'badge-high'}`}>
-                      {r.blocked ? t('blocked') : r.status}
-                    </span>
+                    <button className="btn-secondary btn-sm" onClick={() => navigate('/map')}>
+                      {t('fullMap')} <ArrowRight size={12} />
+                    </button>
                   </div>
-                ))}
-              </div>
-            </div>
 
-            {/* Response Queue card */}
-            <div className="clean-card" style={{ cursor: 'pointer' }} onClick={() => navigate('/emergency-response')}>
-              <div className="card-header-row">
-                <div className="card-title-group">
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <Zap size={16} color="var(--primary)" />
-                    <h3>{t('emergencyResponseTitle')}</h3>
-                  </div>
-                  <p>{t('emergencyResponseDesc')}</p>
+                  <GISMap
+                    district={district}
+                    selectedZone={selectedZone}
+                    onZoneSelect={(zone) => setSelectedZone(zone)}
+                    height={400}
+                  />
                 </div>
-                <span className="status-badge badge-critical" style={{ fontSize: 11 }}>P1 {t('critical')}</span>
+
+                {/* Active Alerts */}
+                <ActiveAlertsPanel limit={4} onRefresh={handleRefresh} />
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 12, fontSize: 13 }}>
-                <div style={{ background: 'var(--bg)', padding: '8px 10px', borderRadius: 6 }}>
-                  <b>#1 Zone NER-011:</b> Southern Highway Gorge
-                  <div style={{ fontSize: 11, color: 'var(--risk-critical)', marginTop: 2 }}>
-                    • {t('evacuationOrder')} for Sohra West
+
+              {/* Priority Risk Situation (RISK → IMPACT → ACTION) */}
+              <PriorityRiskSituation
+                zone={selectedZone}
+                onSelectZone={(z) => setSelectedZone(z)}
+              />
+
+              {/* Supporting Info Section */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 20 }}>
+                {/* IoT Real-time Telemetry Station card */}
+                <div className="clean-card" style={{ cursor: 'pointer' }} onClick={() => navigate('/iot-sensors')}>
+                  <div className="card-header-row">
+                    <div className="card-title-group">
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <Radio size={16} color="var(--primary)" />
+                        <h3>{t('iotSensorsPage')}</h3>
+                      </div>
+                      <p>19 Deployed Sensor Components</p>
+                    </div>
+                    <span className="status-badge badge-critical" style={{ fontSize: 11 }}>{t('critical')}</span>
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 12 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                      <span style={{ fontSize: 14, color: 'var(--text-secondary)' }}>Soil Moisture Sensor V2.0:</span>
+                      <b style={{ fontSize: 22, color: 'var(--risk-critical)' }}>87% Saturation</b>
+                    </div>
+                    <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>
+                      MPU6050 Tilt: 3.8° • Rain FC-37: 187 mm/24h • LoRa-02: -58 dBm
+                    </div>
+                    <div style={{ background: 'var(--bg)', padding: '10px 12px', borderRadius: 6, fontSize: 13, color: 'var(--primary)', fontWeight: 600 }}>
+                      ➔ {t('viewDetails')} in {t('iotSensorsNav')}
+                    </div>
                   </div>
                 </div>
-                <div style={{ background: 'var(--bg)', padding: '8px 10px', borderRadius: 6 }}>
-                  <b>#2 Zone NER-023:</b> Eastern Slope Sector
-                  <div style={{ fontSize: 11, color: 'var(--risk-high)', marginTop: 2 }}>
-                    • {t('resourceDeployment')} on link road
+
+                {/* Infrastructure connectivity card */}
+                <div className="clean-card" style={{ cursor: 'pointer' }} onClick={() => navigate('/roads-villages')}>
+                  <div className="card-header-row">
+                    <div className="card-title-group">
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <Construction size={16} color="var(--risk-critical)" />
+                        <h3>{t('roadsVillagesTitle')}</h3>
+                      </div>
+                      <p>{criticalRoads.length} {t('criticalRoads')}</p>
+                    </div>
+                    <ArrowRight size={14} color="var(--text-muted)" />
                   </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 12, fontSize: 13.5 }}>
+                    {criticalRoads.slice(0, 2).map((r) => (
+                      <div key={r.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid var(--border-subtle)' }}>
+                        <div>
+                          <b>{r.name}</b>
+                          <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{r.agency} • {r.corridor}</div>
+                        </div>
+                        <span className={`status-badge ${r.blocked ? 'badge-critical' : 'badge-high'}`}>
+                          {r.blocked ? t('blocked') : r.status}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Response Queue card */}
+                <div className="clean-card" style={{ cursor: 'pointer' }} onClick={() => navigate('/emergency-response')}>
+                  <div className="card-header-row">
+                    <div className="card-title-group">
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <Zap size={16} color="var(--primary)" />
+                        <h3>{t('emergencyResponseTitle')}</h3>
+                      </div>
+                      <p>{t('emergencyResponseDesc')}</p>
+                    </div>
+                    <span className="status-badge badge-critical" style={{ fontSize: 11 }}>P1 {t('critical')}</span>
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 12, fontSize: 13 }}>
+                    <div style={{ background: 'var(--bg)', padding: '8px 10px', borderRadius: 6 }}>
+                      <b>#1 Zone NER-011:</b> Southern Highway Gorge
+                      <div style={{ fontSize: 11, color: 'var(--risk-critical)', marginTop: 2 }}>
+                        • {t('evacuationOrder')} for Sohra West
+                      </div>
+                    </div>
+                    <div style={{ background: 'var(--bg)', padding: '8px 10px', borderRadius: 6 }}>
+                      <b>#2 Zone NER-023:</b> Eastern Slope Sector
+                      <div style={{ fontSize: 11, color: 'var(--risk-high)', marginTop: 2 }}>
+                        • {t('resourceDeployment')} on link road
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* TAB 2: INFRASTRUCTURE IMPACT */}
+          {activeTab === 'infrastructure' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+              {/* Infrastructure Summary Grid */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16 }}>
+                <div className="clean-card">
+                  <div style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 600 }}>Monitored Highway Corridors</div>
+                  <div style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-primary)', marginTop: 4 }}>7 Lifeline Routes</div>
+                  <div style={{ fontSize: 11.5, color: 'var(--text-secondary)', marginTop: 4 }}>BRO: 2 • NHIDCL: 2 • PWD: 3</div>
+                </div>
+
+                <div className="clean-card" style={{ borderLeft: '4px solid var(--risk-critical)' }}>
+                  <div style={{ fontSize: 12, color: 'var(--risk-critical)', fontWeight: 600 }}>Active Road Blockages</div>
+                  <div style={{ fontSize: 24, fontWeight: 800, color: 'var(--risk-critical)', marginTop: 4 }}>2 Blocked Routes</div>
+                  <div style={{ fontSize: 11.5, color: 'var(--text-muted)', marginTop: 4 }}>NH-44 Km 12 &amp; Shillong-Jowai Seg-6</div>
+                </div>
+
+                <div className="clean-card" style={{ borderLeft: '4px solid var(--risk-high)' }}>
+                  <div style={{ fontSize: 12, color: 'var(--risk-high)', fontWeight: 600 }}>Slope &amp; Bridge Vulnerability</div>
+                  <div style={{ fontSize: 24, fontWeight: 800, color: 'var(--risk-high)', marginTop: 4 }}>3 Bridges At Risk</div>
+                  <div style={{ fontSize: 11.5, color: 'var(--text-muted)', marginTop: 4 }}>Umngot Gorge Bridge B-04 Strain Alert</div>
+                </div>
+
+                <div className="clean-card" style={{ borderLeft: '4px solid #7C3AED' }}>
+                  <div style={{ fontSize: 12, color: '#7C3AED', fontWeight: 600 }}>Isolated Habitations</div>
+                  <div style={{ fontSize: 24, fontWeight: 800, color: '#7C3AED', marginTop: 4 }}>18,400 Residents</div>
+                  <div style={{ fontSize: 11.5, color: 'var(--text-muted)', marginTop: 4 }}>5 Mountain Villages Exposed</div>
+                </div>
+              </div>
+
+              {/* Infrastructure Road Blockages & Clearance Tracking */}
+              <div className="clean-card">
+                <div className="card-header-row" style={{ marginBottom: 14 }}>
+                  <div className="card-title-group">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <Construction size={18} color="var(--risk-critical)" />
+                      <h3>Lifeline Highway Corridors &amp; Real-Time Infrastructure Impact</h3>
+                    </div>
+                    <p>Live status of road blockages, landslide debris volume, clearing machinery, and detour routes.</p>
+                  </div>
+                  <button className="btn-primary btn-sm" onClick={() => navigate('/roads-villages')}>
+                    Full Infrastructure Page →
+                  </button>
+                </div>
+
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+                    <thead>
+                      <tr style={{ background: 'var(--surface-hover)', textAlign: 'left', borderBottom: '2px solid var(--border)' }}>
+                        <th style={{ padding: '10px 14px' }}>Highway / Corridor</th>
+                        <th style={{ padding: '10px 14px' }}>Managing Agency</th>
+                        <th style={{ padding: '10px 14px' }}>Impact Status</th>
+                        <th style={{ padding: '10px 14px' }}>Landslide Debris Est.</th>
+                        <th style={{ padding: '10px 14px' }}>Clearing Machinery</th>
+                        <th style={{ padding: '10px 14px' }}>Detour / Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {roads.map(r => (
+                        <tr key={r.id} style={{ borderBottom: '1px solid var(--border-subtle)' }}>
+                          <td style={{ padding: '12px 14px' }}>
+                            <b>{r.name}</b>
+                            <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{r.corridor} • Slope {r.slopeAngle}°</div>
+                          </td>
+                          <td style={{ padding: '12px 14px', fontWeight: 600 }}>{r.agency}</td>
+                          <td style={{ padding: '12px 14px' }}>
+                            <span className={`status-badge ${r.blocked ? 'badge-critical' : r.risk === 'HIGH' ? 'badge-high' : 'badge-low'}`}>
+                              {r.blocked ? '🚫 BLOCKED' : r.risk === 'HIGH' ? '⚠️ 1 LANE PASSABLE' : '✅ OPERATIONAL'}
+                            </span>
+                          </td>
+                          <td style={{ padding: '12px 14px', fontWeight: 700, color: r.blocked ? 'var(--risk-critical)' : 'var(--text-primary)' }}>
+                            {r.blocked ? '950 m³ Rocks & Soil' : r.risk === 'HIGH' ? '200 m³ Slump' : 'Clear'}
+                          </td>
+                          <td style={{ padding: '12px 14px' }}>
+                            {r.blocked ? '2 JCB Excavators Active (ETA 4h 30m)' : r.risk === 'HIGH' ? '1 Dozer On Standby' : 'Routine Patrol'}
+                          </td>
+                          <td style={{ padding: '12px 14px' }}>
+                            <button
+                              className="btn-secondary btn-sm"
+                              onClick={() => navigate('/roads-villages')}
+                              style={{ fontSize: 11.5 }}
+                            >
+                              {r.blocked ? 'Divert via Link Road' : 'View Corridor'}
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               </div>
             </div>
-          </div>
+          )}
         </>
       )}
 
