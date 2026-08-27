@@ -557,40 +557,7 @@ export default function IoTSensors() {
         </div>
       </div>
 
-      {/* ── Real-Time Sensor Telemetry Status Banner ── */}
-      <div style={{
-        display: 'flex', gap: 12, marginBottom: 20,
-        padding: '16px 20px', background: 'linear-gradient(135deg, #0A1628 0%, #0D2137 100%)',
-        borderRadius: 12, alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <div style={{ width: 42, height: 42, borderRadius: 10, background: '#0891B2', color: '#FFF', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Radio size={22} />
-          </div>
-          <div>
-            <div style={{ fontSize: 15, fontWeight: 800, color: '#FFFFFF', display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span>{t('sensorNetwork')} — {t('realTimeMonitoring')}</span>
-              <span style={{ fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 12, background: 'rgba(6,182,212,0.2)', color: '#06B6D4' }}>
-                19 {t('devices')}
-              </span>
-            </div>
-            <div style={{ fontSize: 12, color: '#94A3B8', marginTop: 2 }}>
-              ESP32 MCU / Camera • Soil Moisture V2.0 • MPU6050 Tilt • LoRa-02 433MHz • Solar DC-DC Power Grid
-            </div>
-          </div>
-        </div>
 
-        <div style={{
-          display: 'flex', alignItems: 'center', gap: 6,
-          padding: '6px 12px', background: 'rgba(6,182,212,0.1)',
-          border: '1px solid rgba(6,182,212,0.25)', borderRadius: 20
-        }}>
-          <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#06B6D4', boxShadow: '0 0 0 2px rgba(6,182,212,0.25)', animation: 'pulse-ring 2s infinite', display: 'inline-block' }} />
-          <span style={{ fontSize: 11, fontWeight: 700, color: '#06B6D4' }}>
-            {t('lastSync')}: {lastRefresh.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' })} IST
-          </span>
-        </div>
-      </div>
 
       {/* ── KPI Strip ── */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 12, marginBottom: 20 }}>

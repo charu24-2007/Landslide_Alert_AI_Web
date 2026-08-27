@@ -22,6 +22,7 @@ import ReportsHistory from './pages/ReportsHistory';
 import Administration from './pages/Administration';
 import IoTSensors from './pages/IoTSensors';
 import AccessDenied from './pages/AccessDenied';
+import InfrastructureImpact from './pages/InfrastructureImpact';
 
 // Data
 import { getAlerts } from './data/alerts';
@@ -103,13 +104,14 @@ function AppShell() {
           <Route path="/emergency-response" element={<ProtectedRoute permission="emergency_response"><EmergencyResponse /></ProtectedRoute>} />
           <Route path="/reports-history" element={<ProtectedRoute permission="reports_history"><ReportsHistory /></ProtectedRoute>} />
           <Route path="/admin" element={<ProtectedRoute permission="admin"><Administration /></ProtectedRoute>} />
+          <Route path="/infrastructure-impact" element={<ProtectedRoute permission="roads_villages"><InfrastructureImpact /></ProtectedRoute>} />
           <Route path="/access-denied" element={<AccessDenied />} />
 
           {/* Legacy & Shortcut Aliases */}
           <Route path="/weather-sensors" element={<Navigate to="/iot-sensors" replace />} />
           <Route path="/weather" element={<Navigate to="/iot-sensors" replace />} />
           <Route path="/sensors" element={<Navigate to="/iot-sensors" replace />} />
-          <Route path="/infrastructure" element={<Navigate to="/roads-villages" replace />} />
+          <Route path="/infrastructure" element={<Navigate to="/infrastructure-impact" replace />} />
           <Route path="/villages" element={<Navigate to="/roads-villages" replace />} />
           <Route path="/field" element={<Navigate to="/field-reports" replace />} />
           <Route path="/response" element={<Navigate to="/emergency-response" replace />} />
