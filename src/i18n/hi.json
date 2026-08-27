@@ -439,5 +439,13 @@
   "multiYearPatterns": "बहु-वर्षीय ऐतिहासिक भूस्खलन पुनरावृत्ति पैटर्न (पूर्वोत्तर)",
   "annualDistribution": "प्रमुख मलबा प्रवाह बनाम छोटे ढलान विफलता का वार्षिक वितरण",
   "totalLandslides": "कुल भूस्खलन",
-  "majorDebrisFlows": "प्रमुख मलबा प्रवाह"
+  "majorDebrisFlows": "प्रमुख मलबा प्रवाह",
+  "infrastructureImpact": "Infrastructure Impact",
+  "lifelineHighways": "Lifeline Highway Corridors & Real-Time Infrastructure Impact",
+  "monitoredHighways": "Monitored Highway Corridors",
+  "activeRoadBlockages": "Active Road Blockages",
+  "slopeBridgeVuln": "Slope & Bridge Vulnerability",
+  "isolatedHabitations": "Isolated Habitations",
+  "liveStatusBlockages": "Live status of road blockages, landslide debris volume, clearing machinery, and detour routes.",
+  "fullInfraPage": "Full Infrastructure Page →"
 }

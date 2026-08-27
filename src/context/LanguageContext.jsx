@@ -2,35 +2,31 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 // Import JSON translations
-import en from '../i18n/en.json';
-import hi from '../i18n/hi.json';
 import as from '../i18n/as.json';
 import bn from '../i18n/bn.json';
-import ta from '../i18n/ta.json';
-import te from '../i18n/te.json';
-import ml from '../i18n/ml.json';
-import kn from '../i18n/kn.json';
-import mr from '../i18n/mr.json';
-import gu from '../i18n/gu.json';
-import or from '../i18n/or.json';
+import mni from '../i18n/mni.json';
+import brx from '../i18n/brx.json';
 import ne from '../i18n/ne.json';
+import kha from '../i18n/kha.json';
+import grt from '../i18n/grt.json';
+import lus from '../i18n/lus.json';
+import trp from '../i18n/trp.json';
+import en from '../i18n/en.json';
 
 export const LANGUAGES = [
-  { code: 'en', label: 'English', native: 'English', fontClass: '' },
-  { code: 'hi', label: 'Hindi', native: 'हिन्दी', fontClass: 'lang-hi' },
   { code: 'as', label: 'Assamese', native: 'অসমীয়া', fontClass: 'lang-as' },
   { code: 'bn', label: 'Bengali', native: 'বাংলা', fontClass: 'lang-bn' },
-  { code: 'ta', label: 'Tamil', native: 'தமிழ்', fontClass: 'lang-ta' },
-  { code: 'te', label: 'Telugu', native: 'తెలుగు', fontClass: 'lang-te' },
-  { code: 'ml', label: 'Malayalam', native: 'മലയാളം', fontClass: 'lang-ml' },
-  { code: 'kn', label: 'Kannada', native: 'ಕನ್ನಡ', fontClass: 'lang-kn' },
-  { code: 'mr', label: 'Marathi', native: 'मराठी', fontClass: 'lang-hi' }, // uses Devanagari font style
-  { code: 'gu', label: 'Gujarati', native: 'ગુજરાતી', fontClass: 'lang-gu' },
-  { code: 'or', label: 'Odia', native: 'ଓଡ଼ିଆ', fontClass: 'lang-or' },
-  { code: 'ne', label: 'Nepali', native: 'नेपाली', fontClass: 'lang-hi' }  // uses Devanagari font style
+  { code: 'mni', label: 'Manipuri (Meitei)', native: 'মৈতৈলোন্', fontClass: 'lang-bn' },
+  { code: 'brx', label: 'Bodo', native: 'बड़ो', fontClass: 'lang-hi' },
+  { code: 'ne', label: 'Nepali', native: 'नेपाली', fontClass: 'lang-hi' },
+  { code: 'kha', label: 'Khasi', native: 'Khasi', fontClass: '' },
+  { code: 'grt', label: 'Garo', native: 'A·chik', fontClass: '' },
+  { code: 'lus', label: 'Mizo', native: 'Mizo', fontClass: '' },
+  { code: 'trp', label: 'Kokborok', native: 'Kokborok', fontClass: '' },
+  { code: 'en', label: 'English', native: 'English', fontClass: '' }
 ];
 
-const TRANSLATIONS = { en, hi, as, bn, ta, te, ml, kn, mr, gu, or, ne };
+const TRANSLATIONS = { as, bn, mni, brx, ne, kha, grt, lus, trp, en };
 
 const LanguageContext = createContext(null);
 

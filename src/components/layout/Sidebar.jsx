@@ -30,7 +30,7 @@ export default function Sidebar({ alertCount = 5 }) {
         { path: '/alerts', label: t('alertsWarnings'), icon: Bell, perm: 'alerts', badge: alertCount },
         { path: '/field-reports', label: t('fieldReports'), icon: Clipboard, perm: 'field_reports' },
         { path: '/roads-villages', label: t('roadsVillages'), icon: Construction, perm: 'roads_villages' },
-        { path: '/infrastructure-impact', label: 'Infrastructure Impact', icon: Building2, perm: 'roads_villages' },
+        { path: '/infrastructure-impact', label: t('infrastructureImpact'), icon: Building2, perm: 'roads_villages' },
         { path: '/emergency-response', label: t('emergencyResponse'), icon: Zap, perm: 'emergency_response' },
         { path: '/reports-history', label: t('reportsHistory'), icon: FileText, perm: 'reports_history' },
         { path: '/admin', label: t('administration'), icon: Settings, perm: 'admin' },
